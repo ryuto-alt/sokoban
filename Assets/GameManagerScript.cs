@@ -4,32 +4,13 @@ using UnityEngine;
 
 public class GameManagerScript : MonoBehaviour
 {
-    int[] map;
 
+    int[] map = { 0, 0, 1, 0, 0, };
+    string debugTXT = "";
 
     // Start is called before the first frame update
-    void Start()
-    {
-        map = new int[] { 0, 0, 0, 1, 0, 2, 0, 0, 0 };
-        PrintArray();
-    }
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            GetPlayerIndex();
 
-        }
-
-        else if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            GetPlayerIndexLeft();
-        }
-
-    }
-
-    private void PrintArray()
+    void PrintArray()
     {
         string debugText = "";
         for (int i = 0; i < map.Length; i++)
@@ -37,75 +18,91 @@ public class GameManagerScript : MonoBehaviour
             debugText += map[i].ToString() + ",";
         }
         Debug.Log(debugText);
-
     }
 
-
-    private void GetPlayerIndex()
+    int GetPlayerIndex()
     {
-        int playerIndex = -1;
         for (int i = 0; i < map.Length; i++)
         {
             if (map[i] == 1)
             {
-                playerIndex = i;
-                break;
+                return i;
             }
-
-
         }
-
-        if (playerIndex < map.Length - 1)
-        {
-            map[playerIndex + 1] = 1;
-            map[playerIndex] = 0;
-        }
-
-        MoveNumber(1, playerIndex, playerIndex + 1);
-        
-        PrintArray();
-
+        return -1;
     }
 
-    private void GetPlayerIndexLeft()
+    void Start()
     {
-        int playerIndex = -1;
+        map = new int[] { 0, 0, 0, 2, 0, 1, 0, 2, 0, 0, 0 };
+        PrintArray();
+
         for (int i = 0; i < map.Length; i++)
         {
-            if (map[i] == 1)
-            {
-                playerIndex = i;
-                break;
-            }
+            debugTXT += map[i].ToString() + ",";
         }
-        if (playerIndex > 0)
-        {
-            map[playerIndex - 1] = 1;
-            map[playerIndex] = 0;
-        }
+        Debug.Log(debugTXT);
 
 
-        MoveNumber(1, playerIndex, playerIndex + 1);
-        PrintArray();
     }
 
-    private bool MoveNumber(int number, int moveFrom, int moveto)
+    bool MoveNumber(int number, int moveFrom, int moveTo)
     {
-        if (moveto < 0 || moveto >= map.Length) { return false; }
-
-        if (map[moveto] == 2)
+        if (moveTo < 0 || moveTo >= map.Length)
         {
-            int velocity = moveto - moveFrom;
-
-
-            bool success = MoveNumber(2, moveto, moveto + velocity);
-
-            if (!success) { return false; }
+            return false;
         }
-
-        map[moveto] = number;
+        if (map[moveTo] == 2)
+        {
+            int velocity = moveTo - moveFrom;
+            bool success = MoveNumber(2, moveTo, moveTo + velocity);
+            if (success == false)
+            {
+                return false;
+            }
+        }
+        map[moveTo] = number;
         map[moveFrom] = 0;
         return true;
     }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+        if (Input.GetKeyDown(KeyCode.RightArrow))
+        {
+            int playerIndex = GetPlayerIndex();
+
+            MoveNumber(1, playerIndex, playerIndex + 1);
+            PrintArray();
+
+            string debugText = "";
+            for (int i = 0; i < map.Length; i++)
+            {
+                debugText += map[i].ToString() + ",";
+            }
+            Debug.Log(debugText);
+        }
+
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        {
+            int playerIndex = GetPlayerIndex();
+
+            MoveNumber(1, playerIndex, playerIndex - 1);
+            PrintArray();
+
+            string debugText = "";
+            for (int i = 0; i < map.Length; i++)
+            {
+                debugText += map[i].ToString() + ",";
+            }
+            Debug.Log(debugText);
+        }
+
+    }
+
+
 
 }
